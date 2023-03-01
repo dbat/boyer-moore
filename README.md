@@ -1,4 +1,5 @@
 # boyer-moore
+binary string search library inc. case insensitive search
 
 Boyer-moore-horspool library in x86 asm (function name may be changed later) for fast searching arbitrary/binary string.
 Also including simple search: memem and memem_nc for case insensitive
