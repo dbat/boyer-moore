@@ -2,38 +2,34 @@
 .mmx
 .model flat, stdcall
 option casemap :none
+;option prologue:none, epilogue:none
 
 ;LOCALS @@
 
 .data
 align 16
 .radix 16
-
 upcase_table \
-    db 000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 00a, 00b, 00c, 00d, 00e, 00f
-    db 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 01a, 01b, 01c, 01d, 01e, 01f
-    db 020, 021, 022, 023, 024, 025, 026, 027, 028, 029, 02a, 02b, 02c, 02d, 02e, 02f
-    db 030, 031, 032, 033, 034, 035, 036, 037, 038, 039, 03a, 03b, 03c, 03d, 03e, 03f
-    db 040, 041, 042, 043, 044, 045, 046, 047, 048, 049, 04a, 04b, 04c, 04d, 04e, 04f
-    db 050, 051, 052, 053, 054, 055, 056, 057, 058, 059, 05a, 05b, 05c, 05d, 05e, 05f
-
-; db 060, 061, 062, 063, 064, 065, 066, 067, 068, 069, 06a, 06b, 06c, 06d, 06e, 06f
-; db 070, 071, 072, 073, 074, 075, 076, 077, 078, 079, 07a, 07b, 07c, 07d, 07e, 07f
-
-    db 060, 041, 042, 043, 044, 045, 046, 047, 048, 049, 04a, 04b, 04c, 04d, 04e, 04f
-    db 050, 051, 052, 053, 054, 055, 056, 057, 058, 059, 05a, 07b, 07c, 07d, 07e, 07f
-
-    db 080, 081, 082, 083, 084, 085, 086, 087, 088, 089, 08a, 08b, 08c, 08d, 08e, 08f
-    db 090, 091, 092, 093, 094, 095, 096, 097, 098, 099, 09a, 09b, 09c, 09d, 09e, 09f
-    db 0a0, 0a1, 0a2, 0a3, 0a4, 0a5, 0a6, 0a7, 0a8, 0a9, 0aa, 0ab, 0ac, 0ad, 0ae, 0af
-    db 0b0, 0b1, 0b2, 0b3, 0b4, 0b5, 0b6, 0b7, 0b8, 0b9, 0ba, 0bb, 0bc, 0bd, 0be, 0bf
-    db 0c0, 0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9, 0ca, 0cb, 0cc, 0cd, 0ce, 0cf
-    db 0d0, 0d1, 0d2, 0d3, 0d4, 0d5, 0d6, 0d7, 0d8, 0d9, 0da, 0db, 0dc, 0dd, 0de, 0df
-    db 0e0, 0e1, 0e2, 0e3, 0e4, 0e5, 0e6, 0e7, 0e8, 0e9, 0ea, 0eb, 0ec, 0ed, 0ee, 0ef
-    db 0f0, 0f1, 0f2, 0f3, 0f4, 0f5, 0f6, 0f7, 0f8, 0f9, 0fa, 0fb, 0fc, 0fd, 0fe, 0ff
+    oword 00f0e0d0c0b0a09080706050403020100
+    oword 01f1e1d1c1b1a19181716151413121110
+    oword 02f2e2d2c2b2a29282726252423222120
+    oword 03f3e3d3c3b3a39383736353433323130
+    oword 04f4e4d4c4b4a49484746454443424140
+    oword 05f5e5d5c5b5a59585756555453525150
+    ;dq 06766656463626160, 06f6e6d6c6b6a6968
+    ;dq 07776757473727170, 07f7e7d7c7b7a7978
+    oword 04f4e4d4c4b4a49484746454443424160
+    oword 07f7e7d7c7b5a59585756555453525150
+    oword 08f8e8d8c8b8a89888786858483828180
+    oword 09f9e9d9c9b9a99989796959493929190
+    oword 0afaeadacabaaa9a8a7a6a5a4a3a2a1a0
+    oword 0bfbebdbcbbbab9b8b7b6b5b4b3b2b1b0
+    oword 0cfcecdcccbcac9c8c7c6c5c4c3c2c1c0
+    oword 0dfdedddcdbdad9d8d7d6d5d4d3d2d1d0
+    oword 0efeeedecebeae9e8e7e6e5e4e3e2e1e0
+    oword 0fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0
 
 .radix 0ah
-
 .code
 align 4
 
@@ -100,10 +96,9 @@ init_bmtable_nc endp
 
 
 public textpos
-; returns position (0-based) of sub-string in other binary string
+; returns pointer of sub-string in other binary string, or NULL if not found
 ; shift_table must already been prepared with init_bmtable
-textpos proc data:dword, datasize:dword, text:dword, 
-  textlen:dword, shift_table:dword
+textpos proc data:dword, datasize:dword, text:dword, textlen:dword, shift_table:dword
     push esi
     push edi
     push ebx
@@ -129,6 +124,7 @@ textpos proc data:dword, datasize:dword, text:dword,
     add esi, eax ; lea esi, [esi + eax]
 
 @@bmStart:
+    xor eax, eax
     cmp esi, edx
     ja @@NOTFOUND
 
@@ -137,10 +133,8 @@ textpos proc data:dword, datasize:dword, text:dword,
     mov ecx, textlen
     mov edx, esi ; store pos
     lea edi, [edi + ecx -1]
-    xor eax, eax
 
 @@fetch:
-    ;movzx eax, byte ptr [esi]
     mov al, [esi]
     dec esi
     cmp al, [edi]
@@ -148,31 +142,20 @@ textpos proc data:dword, datasize:dword, text:dword,
     dec edi
     dec ecx
     jnz @@fetch
-    ;jmp @@FOUND
 
-@@FOUND:
-    lea eax, [esi +1]
-    mov edx, data
-    jmp @@DONE
-
+@@FOUND: lea eax, [esi + 1]
 @@NOTFOUND:
-    lea eax, [edx-1]
-    ;jmp @@DONE
-
 @@DONE:
-    sub eax, edx
     pop ebx
     pop edi
     pop esi
     ret
-
 textpos endp
 
 public textpos_nc
-; returns position (0-based) of sub-string in other binary string
+; returns pointer of sub-string in other binary string, or NULL if not found
 ; shift_table must already been prepared with init_bmtable_nocase
-textpos_nc proc data:dword, datasize:dword,
-  text:dword, textlen:dword, shift_table:dword
+textpos_nc proc data:dword, datasize:dword, text:dword, textlen:dword, shift_table:dword
     push esi
     push edi
     push ebx
@@ -197,13 +180,14 @@ textpos_nc proc data:dword, datasize:dword,
     mov al, [edx]
 
     mov ebx, shift_table
-    mov al, upcase_table[eax]   ; get upcased char
+    mov al, byte ptr upcase_table[eax]   ; get upcased char
     mov esi, edx                ; restore pos
     mov eax, [ebx + eax*4]
     mov edx, [esp + 4]          ; DATA tail
     add esi, eax                ; lea esi, [edx + eax]
 
 @@bmStart:
+    xor eax, eax
     cmp esi, edx
     ja @@NOTFOUND
 
@@ -211,64 +195,52 @@ textpos_nc proc data:dword, datasize:dword,
     mov edi, [esp]      ; text tail
     mov ecx, textlen    ; text len
     mov edx, esi        ; store pos
-    xor eax, eax
 
 @@fetch_nc:
     mov al, [esi]
-    sub esi, 1
-    mov bl, upcase_table[eax]
+    dec esi
+    mov bl, byte ptr upcase_table[eax]
     mov al, [edi]
-    sub edi, 1
-    cmp bl, upcase_table[eax]
+    dec edi
+    cmp bl, byte ptr upcase_table[eax]
     jnz @@shifted
     dec ecx
     jnz @@fetch_nc
-    ;jmp @@FOUND
 
-@@FOUND:
-    lea eax, [esi +1]
-    mov edx, data
-    jmp @@DONE
-
+@@FOUND: lea eax, [esi + 1]
 @@NOTFOUND:
-    lea eax, [edx -1]
-    ;jmp @@DONE
-
 @@DONE:
     add esp, 8
-    sub eax, edx
     pop ebx
     pop edi
     pop esi
     ret
-
 textpos_nc endp
 
 
 public memem
 ; returns pointer of sub-string in other binary string, or NULL if not found
 memem proc data:dword, datasize:dword, text:dword, textlen:dword
-    mov eax, datasize
+    mov edx, datasize
     mov ecx, textlen
-    mov edx, text
-    sub eax, ecx
-    jnl @@Start
     xor eax, eax
-    jmp short @@Stop
+    sub edx, ecx
+    jl @@Stop
 
 @@Start:
     push esi
     mov esi, data
     push edi
     push ebx
-    lea ebx, [eax + esi +1] ; txt-tail
     mov eax, esi
+    lea ebx, [edx + esi +1] ; txt-tail
 
 @@shift1:
     mov esi, eax
+    xor eax, eax
 
 @@begin:
-    cmp eax, ebx
+    cmp esi, ebx
     ja @@notfound
     lea eax, [esi +1]   ; forward-1 pos
     mov ecx, textlen
@@ -276,24 +248,24 @@ memem proc data:dword, datasize:dword, text:dword, textlen:dword
 
 @@fetch:
     mov dl, [esi]
-    add esi, 1
+    inc esi
     cmp dl, [edi]
     jnz @@shift1
-    add edi, 1
-    sub ecx, 1
+    inc edi
+    dec ecx
     jnz @@fetch
-    sub eax, 1  ; rewind-1 pos
-    jmp @@Done
+    dec eax  ; rewind-1 pos
+    ;jmp @@Done
 
 @@notfound:
-    xor eax, eax
+    ;xor eax, eax
 @@Done:
     pop edi
     pop esi
     pop ebx
 
 @@Stop:
-   ret
+    ret
 memem endp
 
 
@@ -301,29 +273,28 @@ public memem_nc
 ; returns pointer of sub-string in other binary string, or NULL if not found
 ; insensitive case search
 memem_nc proc data:dword, datasize:dword, text:dword, textlen:dword
-    mov eax, datasize
+    mov edx, datasize
     mov ecx, textlen
-    mov edx, text
-    sub eax, ecx            ; datasize - textlen
-    jnl @@Start
-    xor eax, eax
-    jmp short @@Stop
+    xor eax, eax            ;
+    sub edx, ecx            ; datasize - textlen
+    jl @@Stop
 
 @@Start:
     push esi
     mov esi, data
     push edi
     push ebx
-    lea ebx, [eax + esi +1] ; last comparable pos
+    lea ebx, [edx + esi +1] ; last comparable pos
+    mov edx, eax            ; zero
     mov eax, esi            ; data
-    xor edx, edx            ;
     push ebx                ; savelast comparable pos
 
 @@shift1:
     mov esi, eax
+    xor eax, eax
 
 @@begin:
-    cmp eax, [esp]
+    cmp esi, [esp]
     ja @@notfound
     lea eax, [esi +1]       ; forward-1 pos
     mov ecx, textlen
@@ -331,19 +302,19 @@ memem_nc proc data:dword, datasize:dword, text:dword, textlen:dword
 
 @@fetch:
     mov dl, [esi]
-    add esi, 1
-    mov bl, upcase_table[edx]
+    inc esi
+    mov bl, byte ptr upcase_table[edx]
     mov dl, [edi]
-    add edi, 1
-    cmp bl, upcase_table[edx]
+    inc edi
+    cmp bl, byte ptr upcase_table[edx]
     jnz @@shift1
-    sub ecx, 1
+    dec ecx
     jnz @@fetch
-    sub eax, 1  ; rewind-1 pos
-    jmp @@Done
+    dec eax; rewind-1 pos
+    ;jmp @@Done
 
 @@notfound:
-    xor eax, eax
+    ;xor eax, eax
 @@Done:
     pop ebx
     pop edi
@@ -352,7 +323,6 @@ memem_nc proc data:dword, datasize:dword, text:dword, textlen:dword
 
 @@Stop:
    ret
-
 memem_nc endp
 
 
