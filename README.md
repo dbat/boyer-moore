@@ -12,11 +12,11 @@ Also including simple search: memem and memem_nc for case insensitive
     
     
     textpos proc data:dword, datasize:dword, text:dword, textlen:dword, shift_table:dword
-    ; returns position (0-based) of sub-string in other binary string
+    ; returns pointer of sub-string in other binary string, or NULL if not found
     ; shift_table must already been prepared with init_bmtable
 
     textpos_nc proc data:dword, datasize:dword, text:dword, textlen:dword, shift_table:dword
-    ; returns position (0-based) of sub-string in other binary string
+    ; returns pointer of sub-string in other binary string, or NULL if not found
     ; shift_table must already been prepared with init_bmtable_nocase
 
 
