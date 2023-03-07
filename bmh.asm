@@ -126,7 +126,7 @@ textpos proc data:dword, datasize:dword, text:dword, textlen:dword, shift_table:
 @@bmStart:
     xor eax, eax
     cmp esi, edx
-    ja @@NOTFOUND
+    jg @@NOTFOUND
 
 @@get_cycle:
     mov edi, text
@@ -189,7 +189,7 @@ textpos_nc proc data:dword, datasize:dword, text:dword, textlen:dword, shift_tab
 @@bmStart:
     xor eax, eax
     cmp esi, edx
-    ja @@NOTFOUND
+    jg @@NOTFOUND
 
 @@get_cycle:
     mov edi, [esp]      ; text tail
@@ -241,7 +241,7 @@ memem proc data:dword, datasize:dword, text:dword, textlen:dword
 
 @@begin:
     cmp esi, ebx
-    ja @@notfound
+    jg @@notfound
     lea eax, [esi +1]   ; forward-1 pos
     mov ecx, textlen
     mov edi, text
@@ -295,7 +295,7 @@ memem_nc proc data:dword, datasize:dword, text:dword, textlen:dword
 
 @@begin:
     cmp esi, [esp]
-    ja @@notfound
+    jg @@notfound
     lea eax, [esi +1]       ; forward-1 pos
     mov ecx, textlen
     mov edi, text
